@@ -55,8 +55,8 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 h-full">
-      <div>
+    <div className="flex flex-col gap-6 h-full overflow-hidden">
+      <div className="flex-shrink-0">
         <h1 className="text-[32px] font-bold leading-[38px] tracking-[-0.02em]">
           Skill Generator
         </h1>
@@ -65,88 +65,90 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
         </p>
       </div>
 
-      <Card className="flex-1 flex flex-col gap-6 p-6">
-        <div className="flex-1 flex flex-col gap-4">
-          <div>
-            <Label htmlFor="description" className="text-base font-medium">
-              Describe your skill
-            </Label>
-            <p className="text-sm text-muted-foreground mt-1 mb-3">
-              Explain what you want the agent to do, what tools it should use, and when it
-              should execute
-            </p>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="Example: Create a skill that monitors my GitHub repositories for new issues and sends me a summary every morning at 9 AM. It should use the GitHub API to fetch issues and format them nicely."
-              className="min-h-[200px] resize-none font-mono text-sm"
-              disabled={isGenerating}
-            />
-          </div>
+      <div className="flex-1 overflow-auto min-h-0">
+        <Card className="flex flex-col gap-6 p-6 h-full">
+          <div className="flex flex-col gap-4">
+            <div>
+              <Label htmlFor="description" className="text-base font-medium">
+                Describe your skill
+              </Label>
+              <p className="text-sm text-muted-foreground mt-1 mb-3">
+                Explain what you want the agent to do, what tools it should use, and when it
+                should execute
+              </p>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Example: Create a skill that monitors my GitHub repositories for new issues and sends me a summary every morning at 9 AM. It should use the GitHub API to fetch issues and format them nicely."
+                className="min-h-[200px] resize-none font-mono text-sm"
+                disabled={isGenerating}
+              />
+            </div>
 
-          <div className="flex gap-3">
-            <Button
-              onClick={handleGenerate}
-              disabled={!description.trim() || isGenerating}
-              className="gap-2"
-            >
-              {isGenerating ? (
-                <>
-                  <div className="animate-shimmer">
+            <div className="flex gap-3">
+              <Button
+                onClick={handleGenerate}
+                disabled={!description.trim() || isGenerating}
+                className="gap-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <div className="animate-shimmer">
+                      <Sparkle size={20} weight="fill" />
+                    </div>
+                    Generating...
+                  </>
+                ) : (
+                  <>
                     <Sparkle size={20} weight="fill" />
-                  </div>
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Sparkle size={20} weight="fill" />
-                  Generate Skill
-                </>
-              )}
-            </Button>
+                    Generate Skill
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
 
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-semibold mb-3">Example prompts</h3>
-          <div className="space-y-2">
-            <button
-              onClick={() =>
-                setDescription(
-                  'Create a skill that checks my Stripe account balance every hour and alerts me if it drops below $1000'
-                )
-              }
-              className="w-full text-left p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-sm"
-              disabled={isGenerating}
-            >
-              Monitor Stripe balance and send alerts
-            </button>
-            <button
-              onClick={() =>
-                setDescription(
-                  'Build a skill that summarizes my Slack messages from the #engineering channel and creates a daily digest'
-                )
-              }
-              className="w-full text-left p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-sm"
-              disabled={isGenerating}
-            >
-              Daily Slack digest from engineering channel
-            </button>
-            <button
-              onClick={() =>
-                setDescription(
-                  'Create a skill that watches for new pull requests in my GitHub repos and runs code quality checks automatically'
-                )
-              }
-              className="w-full text-left p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-sm"
-              disabled={isGenerating}
-            >
-              Automated PR code quality checker
-            </button>
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold mb-3">Example prompts</h3>
+            <div className="space-y-2">
+              <button
+                onClick={() =>
+                  setDescription(
+                    'Create a skill that checks my Stripe account balance every hour and alerts me if it drops below $1000'
+                  )
+                }
+                className="w-full text-left p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-sm"
+                disabled={isGenerating}
+              >
+                Monitor Stripe balance and send alerts
+              </button>
+              <button
+                onClick={() =>
+                  setDescription(
+                    'Build a skill that summarizes my Slack messages from the #engineering channel and creates a daily digest'
+                  )
+                }
+                className="w-full text-left p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-sm"
+                disabled={isGenerating}
+              >
+                Daily Slack digest from engineering channel
+              </button>
+              <button
+                onClick={() =>
+                  setDescription(
+                    'Create a skill that watches for new pull requests in my GitHub repos and runs code quality checks automatically'
+                  )
+                }
+                className="w-full text-left p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-sm"
+                disabled={isGenerating}
+              >
+                Automated PR code quality checker
+              </button>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
         <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">

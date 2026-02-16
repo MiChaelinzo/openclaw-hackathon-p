@@ -58,8 +58,8 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 h-full">
-      <div>
+    <div className="flex flex-col gap-6 h-full overflow-hidden">
+      <div className="flex-shrink-0">
         <h1 className="text-[32px] font-bold leading-[38px] tracking-[-0.02em]">
           AI Debug Assistant
         </h1>
@@ -69,41 +69,43 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
       </div>
 
       {messages.length === 0 ? (
-        <Card className="flex-1 flex flex-col items-center justify-center gap-4 p-12 text-center">
-          <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
-            <ChatCircle size={32} className="text-accent" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2">AI Assistant Ready</h3>
-            <p className="text-sm text-muted-foreground max-w-sm">
-              Ask me to analyze errors, suggest improvements, or explain agent behavior
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 text-left w-full max-w-md mt-4">
-            <button
-              onClick={() =>
-                setInput('How do I create a skill that monitors GitHub issues?')
-              }
-              className="text-sm p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-left"
-            >
-              "How do I create a skill that monitors GitHub issues?"
-            </button>
-            <button
-              onClick={() => setInput('Explain what tool calls are in OpenClaw')}
-              className="text-sm p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-left"
-            >
-              "Explain what tool calls are in OpenClaw"
-            </button>
-            <button
-              onClick={() => setInput('Help me debug why my agent isn\'t responding')}
-              className="text-sm p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-left"
-            >
-              "Help me debug why my agent isn't responding"
-            </button>
-          </div>
-        </Card>
+        <div className="flex-1 overflow-auto">
+          <Card className="h-full flex flex-col items-center justify-center gap-4 p-12 text-center">
+            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
+              <ChatCircle size={32} className="text-accent" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">AI Assistant Ready</h3>
+              <p className="text-sm text-muted-foreground max-w-sm">
+                Ask me to analyze errors, suggest improvements, or explain agent behavior
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 text-left w-full max-w-md mt-4">
+              <button
+                onClick={() =>
+                  setInput('How do I create a skill that monitors GitHub issues?')
+                }
+                className="text-sm p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-left"
+              >
+                "How do I create a skill that monitors GitHub issues?"
+              </button>
+              <button
+                onClick={() => setInput('Explain what tool calls are in OpenClaw')}
+                className="text-sm p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-left"
+              >
+                "Explain what tool calls are in OpenClaw"
+              </button>
+              <button
+                onClick={() => setInput('Help me debug why my agent isn\'t responding')}
+                className="text-sm p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-left"
+              >
+                "Help me debug why my agent isn't responding"
+              </button>
+            </div>
+          </Card>
+        </div>
       ) : (
-        <Card className="flex-1 flex flex-col overflow-hidden">
+        <Card className="flex-1 flex flex-col overflow-hidden min-h-0">
           <ScrollArea className="flex-1 p-4">
             <div className="space-y-4">
               {messages.map(message => (
@@ -149,7 +151,7 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
         </Card>
       )}
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-shrink-0">
         <Textarea
           value={input}
           onChange={e => setInput(e.target.value)}
