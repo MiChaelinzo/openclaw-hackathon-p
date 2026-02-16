@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Code, Pulse, ChatCircle, Sparkle, Storefront } from '@phosphor-icons/react'
+import { Code, Pulse, ChatCircle, Sparkle, Storefront, ChartLine, Flask, House } from '@phosphor-icons/react'
 import { SkillLibrary } from '@/components/SkillLibrary'
 import { ExecutionMonitor } from '@/components/ExecutionMonitor'
 import { AIAssistant } from '@/components/AIAssistant'
@@ -9,6 +9,8 @@ import { SkillGenerator } from '@/components/SkillGenerator'
 import { SkillMarketplace } from '@/components/SkillMarketplace'
 import { SkillDetails } from '@/components/SkillDetails'
 import { PaymentDialog } from '@/components/PaymentDialog'
+import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
+import { TestingPlayground } from '@/components/TestingPlayground'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,6 +18,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Toaster } from '@/components/ui/sonner'
+import { CodeEditor } from '@/components/CodeEditor'
+import { NotificationCenter } from '@/components/NotificationCenter'
+import { QuickActions } from '@/components/QuickActions'
+import { useKeyboardShortcuts, showKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import type { Skill, Execution, PaymentTransaction, Review } from '@/lib/types'
 import { toast } from 'sonner'
 import { marketplaceSkills } from '@/lib/marketplaceData'
@@ -26,7 +32,7 @@ function App() {
   const [executions, setExecutions] = useKV<Execution[]>('agentdev-executions', [])
   const [transactions, setTransactions] = useKV<PaymentTransaction[]>('agentdev-transactions', [])
   const [reviews, setReviews] = useKV<Review[]>('skill-reviews', [])
-  const [activeTab, setActiveTab] = useState('library')
+  const [activeTab, setActiveTab] = useState('dashboard')
   const [showCreateSkill, setShowCreateSkill] = useState(false)
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null)
   const [viewingSkillDetails, setViewingSkillDetails] = useState<Skill | null>(null)
@@ -39,12 +45,6 @@ function App() {
     category: 'Custom'
   })
 
-  useEffect(() => {
-    if (!reviews || reviews.length === 0) {
-      setReviews(sampleReviews)
-    }
-  }, [])
-
   const handleCreateSkill = () => {
     setNewSkill({
       name: '',
@@ -54,6 +54,53 @@ function App() {
     })
     setShowCreateSkill(true)
   }
+
+  useKeyboardShortcuts({
+    shortcuts: [
+      {
+        key: 'n',
+        ctrlKey: true,
+        action: handleCreateSkill,
+        description: 'Create new skill'
+      },
+      {
+        key: 't',
+        ctrlKey: true,
+        action: () => setActiveTab('testing'),
+        description: 'Go to testing'
+      },
+      {
+        key: 'm',
+        ctrlKey: true,
+        action: () => setActiveTab('monitor'),
+        description: 'Go to monitor'
+      },
+      {
+        key: 'k',
+        ctrlKey: true,
+        action: () => setActiveTab('marketplace'),
+        description: 'Go to marketplace'
+      },
+      {
+        key: '/',
+        ctrlKey: true,
+        action: () => showKeyboardShortcuts([
+          { key: 'n', ctrlKey: true, action: () => {}, description: 'Create new skill' },
+          { key: 't', ctrlKey: true, action: () => {}, description: 'Go to testing' },
+          { key: 'm', ctrlKey: true, action: () => {}, description: 'Go to monitor' },
+          { key: 'k', ctrlKey: true, action: () => {}, description: 'Go to marketplace' },
+          { key: '/', ctrlKey: true, action: () => {}, description: 'Show shortcuts' },
+        ]),
+        description: 'Show shortcuts'
+      }
+    ]
+  })
+
+  useEffect(() => {
+    if (!reviews || reviews.length === 0) {
+      setReviews(sampleReviews)
+    }
+  }, [])
 
   const handleSaveSkill = () => {
     if (!newSkill.name || !newSkill.code) {
@@ -74,6 +121,47 @@ function App() {
     setSkills(current => [...(current || []), skill])
     setShowCreateSkill(false)
     toast.success('Skill created successfully')
+  }
+
+  const handleDeleteSkill = (skillId: string) => {
+    setSkills(current => (current || []).filter(s => s.id !== skillId))
+  }
+
+  const handleRunSkill = (skill: Skill) => {
+    simulateExecution(skill.id, skill.name)
+    setActiveTab('monitor')
+  }
+
+  const handleForkSkill = (skill: Skill) => {
+    setSkills(current => [...(current || []), skill])
+  }
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'create-skill':
+        handleCreateSkill()
+        break
+      case 'run-test':
+        setActiveTab('testing')
+        break
+      case 'generate-skill':
+        setActiveTab('generator')
+        break
+      case 'view-analytics':
+        setActiveTab('analytics')
+        break
+      case 'browse-marketplace':
+        setActiveTab('marketplace')
+        break
+      case 'quick-execute':
+        if ((skills || []).length > 0) {
+          const firstSkill = (skills || [])[0]
+          handleRunSkill(firstSkill)
+        } else {
+          toast.info('No skills available to execute')
+        }
+        break
+    }
   }
 
   const handleSelectSkill = (skill: Skill) => {
@@ -242,6 +330,7 @@ function App() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              <NotificationCenter />
               <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
               <span className="text-sm text-muted-foreground">Connected</span>
             </div>
@@ -260,9 +349,13 @@ function App() {
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
             <TabsList className="w-full justify-start mb-6">
+              <TabsTrigger value="dashboard" className="gap-2">
+                <House size={20} weight="fill" />
+                Dashboard
+              </TabsTrigger>
               <TabsTrigger value="library" className="gap-2">
                 <Code size={20} />
-                Skill Library
+                Skills
               </TabsTrigger>
               <TabsTrigger value="marketplace" className="gap-2">
                 <Storefront size={20} />
@@ -270,24 +363,59 @@ function App() {
               </TabsTrigger>
               <TabsTrigger value="monitor" className="gap-2">
                 <Pulse size={20} />
-                Execution Monitor
+                Monitor
+              </TabsTrigger>
+              <TabsTrigger value="testing" className="gap-2">
+                <Flask size={20} />
+                Testing
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="gap-2">
+                <ChartLine size={20} />
+                Analytics
               </TabsTrigger>
               <TabsTrigger value="assistant" className="gap-2">
                 <ChatCircle size={20} />
-                AI Assistant
+                Assistant
               </TabsTrigger>
               <TabsTrigger value="generator" className="gap-2">
                 <Sparkle size={20} weight="fill" />
-                Skill Generator
+                Generator
               </TabsTrigger>
             </TabsList>
 
             <div className="flex-1 overflow-hidden">
+              <TabsContent value="dashboard" className="h-full m-0">
+                <div className="flex flex-col gap-6 h-full overflow-auto">
+                  <div>
+                    <h1 className="text-[32px] font-bold leading-[38px] tracking-[-0.02em]">
+                      Welcome to AgentDev Studio
+                    </h1>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Your OpenClaw development command center
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 space-y-6">
+                      <AnalyticsDashboard 
+                        skills={[...(skills || []), ...marketplaceSkills]} 
+                        executions={executions || []} 
+                      />
+                    </div>
+                    <div>
+                      <QuickActions onAction={handleQuickAction} />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
               <TabsContent value="library" className="h-full m-0">
                 <SkillLibrary
                   skills={skills || []}
                   onSelectSkill={handleSelectSkill}
                   onCreateSkill={handleCreateSkill}
+                  onDeleteSkill={handleDeleteSkill}
+                  onRunSkill={handleRunSkill}
+                  onForkSkill={handleForkSkill}
                 />
               </TabsContent>
 
@@ -302,6 +430,17 @@ function App() {
 
               <TabsContent value="monitor" className="h-full m-0">
                 <ExecutionMonitor executions={executions || []} />
+              </TabsContent>
+
+              <TabsContent value="testing" className="h-full m-0">
+                <TestingPlayground skills={skills || []} />
+              </TabsContent>
+
+              <TabsContent value="analytics" className="h-full m-0">
+                <AnalyticsDashboard 
+                  skills={[...(skills || []), ...marketplaceSkills]} 
+                  executions={executions || []} 
+                />
               </TabsContent>
 
               <TabsContent value="assistant" className="h-full m-0">
@@ -373,13 +512,13 @@ function App() {
 
             <div>
               <Label htmlFor="code">Skill Code *</Label>
-              <Textarea
-                id="code"
-                value={newSkill.code}
-                onChange={e => setNewSkill({ ...newSkill, code: e.target.value })}
-                placeholder="// OpenClaw skill code here..."
-                className="mt-2 min-h-[300px] font-mono text-sm"
-              />
+              <div className="mt-2">
+                <CodeEditor
+                  value={newSkill.code}
+                  onChange={(code) => setNewSkill({ ...newSkill, code })}
+                  language="typescript"
+                />
+              </div>
             </div>
 
             <div className="flex gap-3 pt-4">
