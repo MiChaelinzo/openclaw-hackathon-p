@@ -54,6 +54,13 @@ This is a full-featured developer tool with multiple interconnected systems: ski
 - **Progression**: User configures test inputs → Executes test → Views results → Adjusts and re-tests → Marks as validated
 - **Success criteria**: Users can reliably test agent behavior and catch issues before production use
 
+### 7. x402 Micropayment Integration
+- **Functionality**: Frictionless USDC micropayments for premium skills using x402 protocol on Base network
+- **Purpose**: Enable monetization of premium skills and create an economic layer for the OpenClaw ecosystem
+- **Trigger**: User attempts to install a premium skill with a price > 0
+- **Progression**: Click install on premium skill → Payment dialog opens → Connect wallet → Review transaction details → Execute payment → Auto-retry on failure → Skill installed on success
+- **Success criteria**: Users can successfully purchase premium skills with USDC micropayments, see clear transaction status, and have automatic retry logic for failed payments
+
 ## Edge Case Handling
 
 - **Empty States**: Show helpful getting-started guides when no skills exist or no executions have run

@@ -17,6 +17,31 @@ export interface Skill {
   isVerified?: boolean
   dependencies?: string[]
   documentation?: string
+  paymentAddress?: string
+  x402Enabled?: boolean
+}
+
+export interface PaymentTransaction {
+  id: string
+  skillId: string
+  skillName: string
+  amount: number
+  currency: 'USDC'
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded'
+  timestamp: number
+  txHash?: string
+  fromAddress?: string
+  toAddress?: string
+  error?: string
+  retryCount?: number
+  completedAt?: number
+}
+
+export interface WalletState {
+  address: string | null
+  balance: number
+  isConnected: boolean
+  network?: string
 }
 
 export interface ExecutionStep {

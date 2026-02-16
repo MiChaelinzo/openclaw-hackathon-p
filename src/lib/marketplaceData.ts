@@ -27,7 +27,6 @@ async function trackIssues(repo: string, owner: string) {
   }))
 }
 
-export default trackIssues`,
     category: 'Monitoring',
     tags: ['github', 'automation', 'issues', 'tracking', 'notifications'],
     author: 'OpenClaw Team',
@@ -96,6 +95,8 @@ export default generateEmailResponse`,
     createdAt: Date.now() - 120 * 24 * 60 * 60 * 1000,
     updatedAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
     dependencies: [],
+    paymentAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1',
+    x402Enabled: true,
     documentation: `# Smart Email Responder
 
 Automatically generate contextual email responses using AI.
@@ -134,7 +135,6 @@ Set response parameters in config:
   return JSON.parse(analysis)
 }
 
-export default reviewCode`,
     category: 'Development',
     tags: ['code-review', 'ai', 'github', 'quality', 'security'],
     author: 'DevTools Inc',
@@ -181,7 +181,6 @@ Works with GitHub, GitLab, and Bitbucket.`
   return response.json()
 }
 
-export default sendSlackNotification`,
     category: 'Integration',
     tags: ['slack', 'notifications', 'messaging', 'alerts'],
     author: 'Integrations Team',
@@ -231,7 +230,6 @@ Set SLACK_TOKEN environment variable with your bot token.
   }
 }
 
-export default DataPipeline`,
     category: 'Data',
     tags: ['etl', 'data-processing', 'pipeline', 'automation'],
     author: 'DataOps Team',
@@ -286,7 +284,6 @@ Build robust data processing pipelines.
   }
 }
 
-export default RateLimiter`,
     category: 'Utilities',
     tags: ['rate-limiting', 'api', 'performance', 'reliability'],
     author: 'Performance Labs',
@@ -338,7 +335,6 @@ const result = await limiter.execute(() => fetch(url))
   }
 }
 
-export default DiscordBot`,
     category: 'Integration',
     tags: ['discord', 'bot', 'chat', 'automation', 'community'],
     author: 'Bot Builders',
@@ -386,7 +382,6 @@ bot.command('!hello', (msg) => msg.reply('Hi!'))
   }
 }
 
-export default FileWatcher`,
     category: 'Utilities',
     tags: ['file-system', 'automation', 'monitoring', 'processing'],
     author: 'System Tools',
@@ -436,7 +431,6 @@ function extractData(html: string, selectors: any) {
   return {}
 }
 
-export default scrapeWebsite`,
     category: 'Data',
     tags: ['web-scraping', 'data-extraction', 'automation', 'crawling'],
     author: 'Web Automation Inc',
@@ -495,7 +489,6 @@ Professional web scraping solution.
   }
 }
 
-export default CronScheduler`,
     category: 'Automation',
     tags: ['scheduling', 'cron', 'tasks', 'automation', 'jobs'],
     author: 'Scheduler Pro',
@@ -545,7 +538,6 @@ Schedule recurring tasks with ease.
   return { success: true, size: encrypted.length }
 }
 
-export default backupDatabase`,
     category: 'Data',
     tags: ['backup', 'database', 'storage', 'security', 'automation'],
     author: 'Database Team',
@@ -593,7 +585,6 @@ Automated database backup solution.
   return monitorPipeline(response.id)
 }
 
-export default triggerPipeline`,
     category: 'Development',
     tags: ['ci-cd', 'devops', 'automation', 'deployment', 'testing'],
     author: 'DevOps Team',

@@ -8,6 +8,7 @@ import { AIAssistant } from '@/components/AIAssistant'
 import { SkillGenerator } from '@/components/SkillGenerator'
 import { SkillMarketplace } from '@/components/SkillMarketplace'
 import { SkillDetails } from '@/components/SkillDetails'
+import { PaymentDialog } from '@/components/PaymentDialog'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,17 +16,19 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Toaster } from '@/components/ui/sonner'
-import type { Skill, Execution } from '@/lib/types'
+import type { Skill, Execution, PaymentTransaction } from '@/lib/types'
 import { toast } from 'sonner'
 import { marketplaceSkills } from '@/lib/marketplaceData'
 
 function App() {
   const [skills, setSkills] = useKV<Skill[]>('agentdev-skills', [])
   const [executions, setExecutions] = useKV<Execution[]>('agentdev-executions', [])
+  const [transactions, setTransactions] = useKV<PaymentTransaction[]>('agentdev-transactions', [])
   const [activeTab, setActiveTab] = useState('library')
   const [showCreateSkill, setShowCreateSkill] = useState(false)
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null)
   const [viewingSkillDetails, setViewingSkillDetails] = useState<Skill | null>(null)
+  const [purchasingSkill, setPurchasingSkill] = useState<Skill | null>(null)
 
   const [newSkill, setNewSkill] = useState({
     name: '',
@@ -136,6 +139,11 @@ function App() {
       return
     }
 
+    if (skill.isPremium && skill.price && skill.price > 0) {
+      setPurchasingSkill(skill)
+      return
+    }
+
     const installedSkill: Skill = {
       ...skill,
       id: `installed-${Date.now()}`,
@@ -145,6 +153,21 @@ function App() {
 
     setSkills(current => [...(current || []), installedSkill])
     toast.success(`${skill.name} installed successfully`)
+  }
+
+  const handlePaymentSuccess = () => {
+    if (purchasingSkill) {
+      const installedSkill: Skill = {
+        ...purchasingSkill,
+        id: `installed-${Date.now()}`,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      }
+
+      setSkills(current => [...(current || []), installedSkill])
+      toast.success(`${purchasingSkill.name} installed successfully!`)
+      setPurchasingSkill(null)
+    }
   }
 
   const handleViewMarketplaceDetails = (skill: Skill) => {
@@ -368,6 +391,15 @@ function App() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <PaymentDialog
+        skill={purchasingSkill}
+        open={purchasingSkill !== null}
+        onOpenChange={(open) => {
+          if (!open) setPurchasingSkill(null)
+        }}
+        onSuccess={handlePaymentSuccess}
+      />
     </div>
   )
 }
