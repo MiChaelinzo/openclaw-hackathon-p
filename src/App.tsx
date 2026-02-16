@@ -1,5 +1,322 @@
+import { useState, useEffect } from 'react'
+import { useKV } from '@github/spark/hooks'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Code, Pulse, ChatCircle, Sparkle } from '@phosphor-icons/react'
+import { SkillLibrary } from '@/components/SkillLibrary'
+import { ExecutionMonitor } from '@/components/ExecutionMonitor'
+import { AIAssistant } from '@/components/AIAssistant'
+import { SkillGenerator } from '@/components/SkillGenerator'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Toaster } from '@/components/ui/sonner'
+import type { Skill, Execution } from '@/lib/types'
+import { toast } from 'sonner'
+
 function App() {
-    return <div></div>
+  const [skills, setSkills] = useKV<Skill[]>('agentdev-skills', [])
+  const [executions, setExecutions] = useKV<Execution[]>('agentdev-executions', [])
+  const [activeTab, setActiveTab] = useState('library')
+  const [showCreateSkill, setShowCreateSkill] = useState(false)
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null)
+
+  const [newSkill, setNewSkill] = useState({
+    name: '',
+    description: '',
+    code: '',
+    category: 'Custom'
+  })
+
+  const handleCreateSkill = () => {
+    setNewSkill({
+      name: '',
+      description: '',
+      code: '',
+      category: 'Custom'
+    })
+    setShowCreateSkill(true)
+  }
+
+  const handleSaveSkill = () => {
+    if (!newSkill.name || !newSkill.code) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    const skill: Skill = {
+      id: Date.now().toString(),
+      name: newSkill.name,
+      description: newSkill.description,
+      code: newSkill.code,
+      category: newSkill.category,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    }
+
+    setSkills(current => [...(current || []), skill])
+    setShowCreateSkill(false)
+    toast.success('Skill created successfully')
+  }
+
+  const handleSelectSkill = (skill: Skill) => {
+    setSelectedSkill(skill)
+    setNewSkill({
+      name: skill.name,
+      description: skill.description,
+      code: skill.code,
+      category: skill.category
+    })
+    setShowCreateSkill(true)
+  }
+
+  const handleUpdateSkill = () => {
+    if (!selectedSkill) return
+
+    setSkills(current =>
+      (current || []).map(s =>
+        s.id === selectedSkill.id
+          ? {
+              ...s,
+              name: newSkill.name,
+              description: newSkill.description,
+              code: newSkill.code,
+              category: newSkill.category,
+              updatedAt: Date.now()
+            }
+          : s
+      )
+    )
+    setShowCreateSkill(false)
+    setSelectedSkill(null)
+    toast.success('Skill updated successfully')
+  }
+
+  const handleAIAnalyze = async (prompt: string): Promise<string> => {
+    const context = window.spark.llmPrompt(['You are an expert OpenClaw developer assistant. Help the user with their question about OpenClaw agents, skills, and debugging.\n\nUser question: ', '\n\nContext:\n- OpenClaw is an open-source agent runtime that connects AI models to local tools\n- Skills are reusable capabilities that agents can execute\n- Agents use tool calls to interact with systems\n- Common issues include configuration errors, API authentication, and tool discovery\n\nProvide a helpful, actionable response that helps them solve their problem or understand the concept.'], prompt)
+
+    const response = await window.spark.llm(context, 'gpt-4o-mini')
+    return response
+  }
+
+  const handleGenerateSkill = async (
+    description: string
+  ): Promise<{ name: string; code: string; description: string }> => {
+    const prompt = window.spark.llmPrompt(['You are an expert OpenClaw skill generator. Generate a complete, functional OpenClaw skill based on this description:\n\n', '\n\nReturn a JSON object with these fields:\n- name: A concise skill name (e.g., "GitHub Issue Monitor")\n- description: A clear one-sentence description\n- code: Complete skill code following OpenClaw patterns (include imports, tool usage, error handling)\n\nThe code should be production-ready and follow these patterns:\n- Use proper TypeScript syntax\n- Include error handling\n- Use appropriate tool calls\n- Add helpful comments\n- Follow OpenClaw conventions\n\nReturn ONLY valid JSON with no additional text.'], description)
+
+    const response = await window.spark.llm(prompt, 'gpt-4o-mini', true)
+    const parsed = JSON.parse(response)
+    return parsed
+  }
+
+  const handleSaveGeneratedSkill = (skill: Omit<Skill, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newSkill: Skill = {
+      ...skill,
+      id: Date.now().toString(),
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    }
+
+    setSkills(current => [...(current || []), newSkill])
+    toast.success('Generated skill saved to library')
+    setActiveTab('library')
+  }
+
+  const simulateExecution = (skillId: string, skillName: string) => {
+    const execution: Execution = {
+      id: Date.now().toString(),
+      skillId,
+      skillName,
+      status: 'running',
+      steps: [
+        {
+          id: '1',
+          type: 'reasoning',
+          content: 'Analyzing task requirements...',
+          timestamp: Date.now()
+        },
+        {
+          id: '2',
+          type: 'tool_call',
+          content: 'Calling GitHub API to fetch issues',
+          timestamp: Date.now() + 100,
+          toolName: 'github_fetch'
+        },
+        {
+          id: '3',
+          type: 'result',
+          content: 'Successfully retrieved 5 issues',
+          timestamp: Date.now() + 200
+        }
+      ],
+      startTime: Date.now()
+    }
+
+    setExecutions(current => [...(current || []), execution])
+
+    setTimeout(() => {
+      setExecutions(current =>
+        (current || []).map(e =>
+          e.id === execution.id
+            ? { ...e, status: 'success', endTime: Date.now() + 300 }
+            : e
+        )
+      )
+    }, 3000)
+  }
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Toaster />
+      <div className="border-b border-border bg-card">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">AgentDev Studio</h1>
+              <p className="text-sm text-muted-foreground">
+                OpenClaw Development Environment
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+              <span className="text-sm text-muted-foreground">Connected</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 py-6 h-[calc(100vh-88px)]">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+          <TabsList className="w-full justify-start mb-6">
+            <TabsTrigger value="library" className="gap-2">
+              <Code size={20} />
+              Skill Library
+            </TabsTrigger>
+            <TabsTrigger value="monitor" className="gap-2">
+              <Pulse size={20} />
+              Execution Monitor
+            </TabsTrigger>
+            <TabsTrigger value="assistant" className="gap-2">
+              <ChatCircle size={20} />
+              AI Assistant
+            </TabsTrigger>
+            <TabsTrigger value="generator" className="gap-2">
+              <Sparkle size={20} weight="fill" />
+              Skill Generator
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="flex-1 overflow-hidden">
+            <TabsContent value="library" className="h-full m-0">
+              <SkillLibrary
+                skills={skills || []}
+                onSelectSkill={handleSelectSkill}
+                onCreateSkill={handleCreateSkill}
+              />
+            </TabsContent>
+
+            <TabsContent value="monitor" className="h-full m-0">
+              <ExecutionMonitor executions={executions || []} />
+            </TabsContent>
+
+            <TabsContent value="assistant" className="h-full m-0">
+              <AIAssistant onAnalyze={handleAIAnalyze} />
+            </TabsContent>
+
+            <TabsContent value="generator" className="h-full m-0">
+              <SkillGenerator
+                onGenerate={handleGenerateSkill}
+                onSave={handleSaveGeneratedSkill}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
+
+      <Dialog open={showCreateSkill} onOpenChange={setShowCreateSkill}>
+        <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">
+              {selectedSkill ? 'Edit Skill' : 'Create New Skill'}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-auto space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name">Skill Name *</Label>
+                <Input
+                  id="name"
+                  value={newSkill.name}
+                  onChange={e => setNewSkill({ ...newSkill, name: e.target.value })}
+                  placeholder="GitHub Issue Monitor"
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={newSkill.category}
+                  onValueChange={category => setNewSkill({ ...newSkill, category })}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Custom">Custom</SelectItem>
+                    <SelectItem value="Generated">Generated</SelectItem>
+                    <SelectItem value="Monitoring">Monitoring</SelectItem>
+                    <SelectItem value="Automation">Automation</SelectItem>
+                    <SelectItem value="Integration">Integration</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={newSkill.description}
+                onChange={e => setNewSkill({ ...newSkill, description: e.target.value })}
+                placeholder="Monitors GitHub repositories for new issues..."
+                className="mt-2 min-h-[80px]"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="code">Skill Code *</Label>
+              <Textarea
+                id="code"
+                value={newSkill.code}
+                onChange={e => setNewSkill({ ...newSkill, code: e.target.value })}
+                placeholder="// OpenClaw skill code here..."
+                className="mt-2 min-h-[300px] font-mono text-sm"
+              />
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button onClick={selectedSkill ? handleUpdateSkill : handleSaveSkill}>
+                {selectedSkill ? 'Update Skill' : 'Create Skill'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowCreateSkill(false)
+                  setSelectedSkill(null)
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
 }
 
 export default App
