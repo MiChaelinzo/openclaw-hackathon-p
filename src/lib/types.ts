@@ -6,6 +6,17 @@ export interface Skill {
   category: string
   createdAt: number
   updatedAt: number
+  tags?: string[]
+  author?: string
+  version?: string
+  downloads?: number
+  rating?: number
+  reviews?: number
+  price?: number
+  isPremium?: boolean
+  isVerified?: boolean
+  dependencies?: string[]
+  documentation?: string
 }
 
 export interface ExecutionStep {

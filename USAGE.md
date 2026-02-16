@@ -4,12 +4,13 @@ Learn how to use each feature of AgentDev Studio effectively.
 
 ## Overview
 
-AgentDev Studio has four main sections accessible via the top navigation tabs:
+AgentDev Studio has five main sections accessible via the top navigation tabs:
 
 1. **Skill Library** - Manage your OpenClaw skills
-2. **Execution Monitor** - Track agent executions in real-time
-3. **AI Assistant** - Get debugging help and guidance
-4. **Skill Generator** - Create skills from natural language
+2. **Marketplace** - Discover and install community skills
+3. **Execution Monitor** - Track agent executions in real-time
+4. **AI Assistant** - Get debugging help and guidance
+5. **Skill Generator** - Create skills from natural language
 
 ---
 
@@ -21,6 +22,9 @@ Skills are organized by category:
 - **Monitoring**: Skills that watch systems and send alerts
 - **Automation**: Skills that automate repetitive tasks
 - **Integration**: Skills that connect different services
+- **Development**: Tools for developers
+- **Data**: ETL and data processing
+- **Utilities**: General purpose tools
 - **Custom**: Your manually created skills
 - **Generated**: AI-generated skills
 
@@ -61,6 +65,153 @@ export default mySkill;
 1. Click on any skill card in the library
 2. Modify the skill details in the dialog
 3. Click "Update Skill" to save changes
+
+---
+
+## Skill Marketplace
+
+### Discovering Skills
+
+The marketplace provides access to 12+ pre-built community skills across multiple categories:
+
+**Browse Tab**: Full marketplace with advanced filtering
+**Featured Tab**: High-quality, verified skills (4.5+ stars)
+**Trending Tab**: Most popular skills by downloads
+
+### Searching & Filtering
+
+**Search Bar**
+- Type to search across names, descriptions, and tags
+- Results update in real-time as you type
+
+**Category Filter**
+- Filter by skill type (Monitoring, Automation, Data, etc.)
+- Select "All Categories" to see everything
+
+**Sort Options**
+- **Most Popular**: Ordered by download count
+- **Most Recent**: Newest skills first
+- **Highest Rated**: Best ratings first
+- **Name (A-Z)**: Alphabetical order
+
+**Quick Filters**
+- **Verified**: Show only OpenClaw team verified skills
+- **Premium**: Show only professionally maintained skills
+- **Price**: Filter by free, paid, or all skills
+
+**Tag Filters**
+- Click any tag to filter by that topic
+- Multiple tags can be selected
+- Click again to remove tag filter
+
+**Clear Filters**
+- Click "Clear all" to reset all filters at once
+
+### Viewing Skill Details
+
+Click any skill card to view:
+- Complete description and use cases
+- Full source code with syntax
+- Documentation and examples
+- Dependencies and requirements
+- Author information
+- Ratings, reviews, and downloads
+- Version and update history
+- Installation button
+
+### Installing Skills
+
+**From Browse/Trending View:**
+1. Find the skill you want
+2. Click "Install" button on the card
+3. Skill is added to your library instantly
+
+**From Detail View:**
+1. Click skill card to open details
+2. Review code and documentation
+3. Click "Install Skill" button
+4. Navigate back or go to library
+
+**Important Notes:**
+- Already installed skills show "Installed" (disabled button)
+- Skills are installed with all metadata (author, rating, etc.)
+- Installed skills appear immediately in your Skill Library
+
+### Understanding Quality Indicators
+
+**Verified Badge** (✓ with cyan check)
+- Reviewed by OpenClaw team
+- Security checked
+- Well documented
+- Actively maintained
+
+**Premium Badge** (👑 crown icon)
+- Professional quality
+- Advanced features
+- Priority support
+- May have pricing (future)
+
+**Star Ratings** (⭐)
+- Community rating from 1-5 stars
+- Number of reviews shown in parentheses
+- Average of all user ratings
+
+**Download Count** (↓ download icon)
+- Total community installs
+- Indicates popularity and trust
+- Higher count = more battle-tested
+
+### Marketplace Categories
+
+**Monitoring**
+- GitHub issue trackers
+- System health monitors
+- Alert systems
+
+**Automation**
+- Email responders
+- Task schedulers
+- Workflow automation
+
+**Development**
+- Code review assistants
+- CI/CD triggers
+- Testing tools
+
+**Integration**
+- Slack/Discord bots
+- API connectors
+- Webhook handlers
+
+**Data**
+- ETL pipelines
+- Web scrapers
+- Database backups
+
+**Utilities**
+- Rate limiters
+- File watchers
+- Helper functions
+
+### Example Marketplace Skills
+
+**GitHub Issue Tracker** (Free, Verified)
+- Monitors repositories for new issues
+- Automatic labeling
+- Sentiment analysis
+- 15K+ downloads, 4.8★ rating
+
+**Smart Email Responder** ($9.99, Premium)
+- AI-powered email automation
+- Context-aware responses
+- Multi-language support
+- 8.7K downloads, 4.6★ rating
+
+**Code Review Assistant** (Free, Verified)
+- Automated PR analysis
+- Security scanning
+- Best practice checks
+- 12.4K downloads, 4.9★ rating
 
 ---
 

@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Code, Pulse, ChatCircle, Sparkle } from '@phosphor-icons/react'
+import { Code, Pulse, ChatCircle, Sparkle, Storefront } from '@phosphor-icons/react'
 import { SkillLibrary } from '@/components/SkillLibrary'
 import { ExecutionMonitor } from '@/components/ExecutionMonitor'
 import { AIAssistant } from '@/components/AIAssistant'
 import { SkillGenerator } from '@/components/SkillGenerator'
+import { SkillMarketplace } from '@/components/SkillMarketplace'
+import { SkillDetails } from '@/components/SkillDetails'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Toaster } from '@/components/ui/sonner'
 import type { Skill, Execution } from '@/lib/types'
 import { toast } from 'sonner'
+import { marketplaceSkills } from '@/lib/marketplaceData'
 
 function App() {
   const [skills, setSkills] = useKV<Skill[]>('agentdev-skills', [])
@@ -22,6 +25,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('library')
   const [showCreateSkill, setShowCreateSkill] = useState(false)
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null)
+  const [viewingSkillDetails, setViewingSkillDetails] = useState<Skill | null>(null)
 
   const [newSkill, setNewSkill] = useState({
     name: '',
@@ -124,6 +128,33 @@ function App() {
     setActiveTab('library')
   }
 
+  const handleInstallSkill = (skill: Skill) => {
+    const isAlreadyInstalled = (skills || []).some(s => s.id === skill.id)
+    
+    if (isAlreadyInstalled) {
+      toast.info('Skill is already installed')
+      return
+    }
+
+    const installedSkill: Skill = {
+      ...skill,
+      id: `installed-${Date.now()}`,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    }
+
+    setSkills(current => [...(current || []), installedSkill])
+    toast.success(`${skill.name} installed successfully`)
+  }
+
+  const handleViewMarketplaceDetails = (skill: Skill) => {
+    setViewingSkillDetails(skill)
+  }
+
+  const handleCloseSkillDetails = () => {
+    setViewingSkillDetails(null)
+  }
+
   const simulateExecution = (skillId: string, skillName: string) => {
     const execution: Execution = {
       id: Date.now().toString(),
@@ -188,51 +219,73 @@ function App() {
       </div>
 
       <div className="container mx-auto px-6 py-6 h-[calc(100vh-88px)]">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="w-full justify-start mb-6">
-            <TabsTrigger value="library" className="gap-2">
-              <Code size={20} />
-              Skill Library
-            </TabsTrigger>
-            <TabsTrigger value="monitor" className="gap-2">
-              <Pulse size={20} />
-              Execution Monitor
-            </TabsTrigger>
-            <TabsTrigger value="assistant" className="gap-2">
-              <ChatCircle size={20} />
-              AI Assistant
-            </TabsTrigger>
-            <TabsTrigger value="generator" className="gap-2">
-              <Sparkle size={20} weight="fill" />
-              Skill Generator
-            </TabsTrigger>
-          </TabsList>
+        {viewingSkillDetails ? (
+          <SkillDetails
+            skill={viewingSkillDetails}
+            isInstalled={(skills || []).some(s => s.id === viewingSkillDetails.id || s.name === viewingSkillDetails.name)}
+            onInstall={() => handleInstallSkill(viewingSkillDetails)}
+            onBack={handleCloseSkillDetails}
+          />
+        ) : (
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+            <TabsList className="w-full justify-start mb-6">
+              <TabsTrigger value="library" className="gap-2">
+                <Code size={20} />
+                Skill Library
+              </TabsTrigger>
+              <TabsTrigger value="marketplace" className="gap-2">
+                <Storefront size={20} />
+                Marketplace
+              </TabsTrigger>
+              <TabsTrigger value="monitor" className="gap-2">
+                <Pulse size={20} />
+                Execution Monitor
+              </TabsTrigger>
+              <TabsTrigger value="assistant" className="gap-2">
+                <ChatCircle size={20} />
+                AI Assistant
+              </TabsTrigger>
+              <TabsTrigger value="generator" className="gap-2">
+                <Sparkle size={20} weight="fill" />
+                Skill Generator
+              </TabsTrigger>
+            </TabsList>
 
-          <div className="flex-1 overflow-hidden">
-            <TabsContent value="library" className="h-full m-0">
-              <SkillLibrary
-                skills={skills || []}
-                onSelectSkill={handleSelectSkill}
-                onCreateSkill={handleCreateSkill}
-              />
-            </TabsContent>
+            <div className="flex-1 overflow-hidden">
+              <TabsContent value="library" className="h-full m-0">
+                <SkillLibrary
+                  skills={skills || []}
+                  onSelectSkill={handleSelectSkill}
+                  onCreateSkill={handleCreateSkill}
+                />
+              </TabsContent>
 
-            <TabsContent value="monitor" className="h-full m-0">
-              <ExecutionMonitor executions={executions || []} />
-            </TabsContent>
+              <TabsContent value="marketplace" className="h-full m-0">
+                <SkillMarketplace
+                  skills={marketplaceSkills}
+                  installedSkills={skills || []}
+                  onInstallSkill={handleInstallSkill}
+                  onViewDetails={handleViewMarketplaceDetails}
+                />
+              </TabsContent>
 
-            <TabsContent value="assistant" className="h-full m-0">
-              <AIAssistant onAnalyze={handleAIAnalyze} />
-            </TabsContent>
+              <TabsContent value="monitor" className="h-full m-0">
+                <ExecutionMonitor executions={executions || []} />
+              </TabsContent>
 
-            <TabsContent value="generator" className="h-full m-0">
-              <SkillGenerator
-                onGenerate={handleGenerateSkill}
-                onSave={handleSaveGeneratedSkill}
-              />
-            </TabsContent>
-          </div>
-        </Tabs>
+              <TabsContent value="assistant" className="h-full m-0">
+                <AIAssistant onAnalyze={handleAIAnalyze} />
+              </TabsContent>
+
+              <TabsContent value="generator" className="h-full m-0">
+                <SkillGenerator
+                  onGenerate={handleGenerateSkill}
+                  onSave={handleSaveGeneratedSkill}
+                />
+              </TabsContent>
+            </div>
+          </Tabs>
+        )}
       </div>
 
       <Dialog open={showCreateSkill} onOpenChange={setShowCreateSkill}>

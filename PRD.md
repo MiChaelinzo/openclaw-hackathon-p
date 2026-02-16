@@ -19,28 +19,35 @@ This is a full-featured developer tool with multiple interconnected systems: ski
 - **Progression**: Skill library view → Select/create skill → Code editor with validation → Test interface → Save and deploy
 - **Success criteria**: Users can create valid OpenClaw skills, see validation errors in real-time, and test execution
 
-### 2. Execution Monitor
+### 2. Skill Marketplace
+- **Functionality**: Browse, search, filter, and install skills from a community marketplace with ratings, tags, and detailed information
+- **Purpose**: Enable skill discovery and reuse across the OpenClaw ecosystem
+- **Trigger**: User navigates to Marketplace tab
+- **Progression**: Browse marketplace → Search/filter skills → View details → Install skill → Use in projects
+- **Success criteria**: Users can find relevant skills quickly, understand quality through ratings/reviews, and install with one click
+
+### 3. Execution Monitor
 - **Functionality**: Real-time visualization of agent executions showing tool calls, reasoning steps, and results
 - **Purpose**: Understand what agents are doing and debug execution flows
 - **Trigger**: Agent executes or user loads execution history
 - **Progression**: Execution starts → Real-time step display → Tool calls visualized → Results shown → Success/error state
 - **Success criteria**: Developers can trace every step of agent execution and identify bottlenecks or failures
 
-### 3. AI Debug Assistant
+### 4. AI Debug Assistant
 - **Functionality**: Context-aware AI assistant that analyzes errors, suggests fixes, and explains agent behavior
 - **Purpose**: Accelerate debugging and help developers understand complex agent patterns
 - **Trigger**: User clicks "Analyze Error" or asks question in chat
 - **Progression**: User describes issue → AI analyzes context (code, logs, errors) → Generates insights → Suggests specific fixes → User applies changes
 - **Success criteria**: AI provides actionable debugging advice that resolves real issues
 
-### 4. Skill Generator
+### 5. Skill Generator
 - **Functionality**: AI-powered tool that generates OpenClaw skills from natural language descriptions
 - **Purpose**: Bootstrap new skills quickly and teach OpenClaw patterns
 - **Trigger**: User describes desired skill functionality
 - **Progression**: User enters description → AI generates skill code → Preview with explanation → User reviews/edits → Save to library
 - **Success criteria**: Generated skills are syntactically valid and functionally appropriate
 
-### 5. Testing Playground
+### 6. Testing Playground
 - **Functionality**: Interactive environment to test skills and agents with different inputs and configurations
 - **Purpose**: Validate agent behavior before deployment
 - **Trigger**: User clicks "Test" on a skill or agent configuration
@@ -55,6 +62,10 @@ This is a full-featured developer tool with multiple interconnected systems: ski
 - **Network Failures**: Graceful degradation with offline mode and retry mechanisms
 - **Concurrent Executions**: Handle multiple simultaneous agent runs without UI conflicts
 - **Invalid Skill Formats**: Parse errors gracefully and guide users to correct structure
+- **Marketplace Search**: Handle empty search results with helpful suggestions and filter clearing
+- **Duplicate Installs**: Prevent installing the same skill multiple times with intelligent detection
+- **Premium Skills**: Display pricing clearly and handle payment flows (future integration)
+- **Version Conflicts**: Detect dependency conflicts and warn users before installation
 
 ## Design Direction
 
@@ -136,15 +147,24 @@ Animations should feel precise and purposeful, enhancing the developer experienc
 
 **Icon Selection**:
 - Code (terminal icon) for skill library
+- Storefront for marketplace
 - Activity (pulse) for execution monitor
 - ChatCircle for AI assistant
 - Flask for testing playground
+- Sparkle for featured/generator
+- TrendUp for trending
 - Play for execute actions
 - Bug for debug features
 - Plus for create new
 - MagnifyingGlass for search
 - Check for success states
 - X for errors and close actions
+- Star for ratings
+- Download for install/download metrics
+- SealCheck for verified badges
+- Crown for premium skills
+- Tag for tags/labels
+- Funnel for filters
 
 **Spacing**:
 - Container padding: p-6
