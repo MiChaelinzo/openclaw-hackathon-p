@@ -16,14 +16,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Toaster } from '@/components/ui/sonner'
-import type { Skill, Execution, PaymentTransaction } from '@/lib/types'
+import type { Skill, Execution, PaymentTransaction, Review } from '@/lib/types'
 import { toast } from 'sonner'
 import { marketplaceSkills } from '@/lib/marketplaceData'
+import { sampleReviews } from '@/lib/sampleReviews'
 
 function App() {
   const [skills, setSkills] = useKV<Skill[]>('agentdev-skills', [])
   const [executions, setExecutions] = useKV<Execution[]>('agentdev-executions', [])
   const [transactions, setTransactions] = useKV<PaymentTransaction[]>('agentdev-transactions', [])
+  const [reviews, setReviews] = useKV<Review[]>('skill-reviews', [])
   const [activeTab, setActiveTab] = useState('library')
   const [showCreateSkill, setShowCreateSkill] = useState(false)
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null)
@@ -36,6 +38,12 @@ function App() {
     code: '',
     category: 'Custom'
   })
+
+  useEffect(() => {
+    if (!reviews || reviews.length === 0) {
+      setReviews(sampleReviews)
+    }
+  }, [])
 
   const handleCreateSkill = () => {
     setNewSkill({

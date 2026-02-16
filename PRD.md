@@ -20,11 +20,18 @@ This is a full-featured developer tool with multiple interconnected systems: ski
 - **Success criteria**: Users can create valid OpenClaw skills, see validation errors in real-time, and test execution
 
 ### 2. Skill Marketplace
-- **Functionality**: Browse, search, filter, and install skills from a community marketplace with ratings, tags, and detailed information
-- **Purpose**: Enable skill discovery and reuse across the OpenClaw ecosystem
+- **Functionality**: Browse, search, filter, and install skills from a community marketplace with ratings, tags, detailed information, and user reviews
+- **Purpose**: Enable skill discovery, reuse, and informed decision-making across the OpenClaw ecosystem through community feedback
 - **Trigger**: User navigates to Marketplace tab
-- **Progression**: Browse marketplace → Search/filter skills → View details → Install skill → Use in projects
-- **Success criteria**: Users can find relevant skills quickly, understand quality through ratings/reviews, and install with one click
+- **Progression**: Browse marketplace → Search/filter skills → View details and reviews → Read community feedback → Install skill → Submit review after use
+- **Success criteria**: Users can find relevant skills quickly, understand quality through ratings/reviews, read detailed user feedback, and contribute their own reviews
+
+### 2a. User Review System
+- **Functionality**: Complete review and rating system allowing users to submit, view, and vote on skill reviews with 1-5 star ratings
+- **Purpose**: Build trust through community validation and help users make informed decisions about skill quality
+- **Trigger**: User clicks "Write Review" button or views the Reviews tab in skill details
+- **Progression**: User installs skill → Uses skill → Opens skill details → Clicks Write Review → Rates 1-5 stars → Writes title and detailed comment → Submits → Review appears in skill's review list → Other users can vote helpful/not helpful
+- **Success criteria**: Users can submit comprehensive reviews, see rating distributions, filter/sort reviews, and vote on review helpfulness
 
 ### 3. Execution Monitor
 - **Functionality**: Real-time visualization of agent executions showing tool calls, reasoning steps, and results
@@ -71,6 +78,8 @@ This is a full-featured developer tool with multiple interconnected systems: ski
 - **Invalid Skill Formats**: Parse errors gracefully and guide users to correct structure
 - **Marketplace Search**: Handle empty search results with helpful suggestions and filter clearing
 - **Duplicate Installs**: Prevent installing the same skill multiple times with intelligent detection
+- **Review Submission**: Validate reviews (minimum 20 characters, 1-5 star rating required), prevent duplicate reviews from same user
+- **Review Voting**: Track user votes persistently, prevent conflicting votes (can't vote both helpful and not helpful)
 - **Premium Skills**: Display pricing clearly and handle payment flows (future integration)
 - **Version Conflicts**: Detect dependency conflicts and warn users before installation
 
@@ -156,7 +165,7 @@ Animations should feel precise and purposeful, enhancing the developer experienc
 - Code (terminal icon) for skill library
 - Storefront for marketplace
 - Activity (pulse) for execution monitor
-- ChatCircle for AI assistant
+- ChatCircle for AI assistant and reviews
 - Flask for testing playground
 - Sparkle for featured/generator
 - TrendUp for trending
@@ -166,12 +175,15 @@ Animations should feel precise and purposeful, enhancing the developer experienc
 - MagnifyingGlass for search
 - Check for success states
 - X for errors and close actions
-- Star for ratings
+- Star for ratings and reviews
 - Download for install/download metrics
 - SealCheck for verified badges
 - Crown for premium skills
 - Tag for tags/labels
 - Funnel for filters
+- ThumbsUp/ThumbsDown for review voting
+- User for author/reviewer avatars
+- SortAscending for sort options
 
 **Spacing**:
 - Container padding: p-6

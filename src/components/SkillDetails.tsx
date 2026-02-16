@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { useKV } from '@github/spark/hooks'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,9 +17,13 @@ import {
   Code,
   FileText,
   ArrowLeft,
-  Tag
+  Tag,
+  ChatCircle
 } from '@phosphor-icons/react'
-import type { Skill } from '@/lib/types'
+import type { Skill, Review } from '@/lib/types'
+import { SkillReviews } from '@/components/SkillReviews'
+import { WriteReviewDialog } from '@/components/WriteReviewDialog'
+import { toast } from 'sonner'
 
 interface SkillDetailsProps {
   skill: Skill
@@ -27,6 +33,61 @@ interface SkillDetailsProps {
 }
 
 export function SkillDetails({ skill, isInstalled, onInstall, onBack }: SkillDetailsProps) {
+  const [reviews, setReviews] = useKV<Review[]>('skill-reviews', [])
+  const [userReviews, setUserReviews] = useKV<Record<string, string>>('user-skill-reviews', {})
+  const [showWriteReview, setShowWriteReview] = useState(false)
+  const [currentUser, setCurrentUser] = useState<{ id: string; login: string; avatarUrl: string } | null>(null)
+
+  const skillReviews = (reviews || []).filter(r => r.skillId === skill.id)
+  const userHasReviewed = userReviews?.[skill.id] !== undefined
+
+  useState(() => {
+    window.spark.user().then(user => {
+      if (user) {
+        setCurrentUser({
+          id: String(user.id),
+          login: user.login || 'Anonymous',
+          avatarUrl: user.avatarUrl || ''
+        })
+      }
+    })
+  })
+
+  const handleWriteReview = () => {
+    if (!currentUser) {
+      toast.error('Unable to get user information')
+      return
+    }
+    setShowWriteReview(true)
+  }
+
+  const handleSubmitReview = async (reviewData: { rating: number; title: string; comment: string }) => {
+    if (!currentUser) {
+      toast.error('Unable to submit review')
+      return
+    }
+
+    const newReview: Review = {
+      id: `review-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      skillId: skill.id,
+      userId: currentUser.id,
+      userName: currentUser.login,
+      userAvatar: currentUser.avatarUrl,
+      rating: reviewData.rating,
+      title: reviewData.title,
+      comment: reviewData.comment,
+      helpful: 0,
+      notHelpful: 0,
+      verified: isInstalled,
+      timestamp: Date.now()
+    }
+
+    setReviews(current => [...(current || []), newReview])
+    setUserReviews(current => ({ ...(current || {}), [skill.id]: newReview.id }))
+    
+    toast.success('Review submitted successfully!')
+  }
+
   return (
     <div className="flex flex-col gap-6 h-full">
       <div className="flex items-center gap-4">
@@ -71,6 +132,10 @@ export function SkillDetails({ skill, isInstalled, onInstall, onBack }: SkillDet
                 <FileText size={18} />
                 Documentation
               </TabsTrigger>
+              <TabsTrigger value="reviews" className="gap-2">
+                <ChatCircle size={18} />
+                Reviews ({skillReviews.length})
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="code" className="flex-1 mt-4">
@@ -103,6 +168,15 @@ export function SkillDetails({ skill, isInstalled, onInstall, onBack }: SkillDet
                   </div>
                 )}
               </Card>
+            </TabsContent>
+
+            <TabsContent value="reviews" className="flex-1 mt-4">
+              <SkillReviews
+                skill={skill}
+                reviews={skillReviews}
+                userHasReviewed={userHasReviewed}
+                onWriteReview={handleWriteReview}
+              />
             </TabsContent>
           </Tabs>
         </div>
@@ -230,6 +304,13 @@ export function SkillDetails({ skill, isInstalled, onInstall, onBack }: SkillDet
           )}
         </div>
       </div>
+
+      <WriteReviewDialog
+        skill={skill}
+        open={showWriteReview}
+        onOpenChange={setShowWriteReview}
+        onSubmit={handleSubmitReview}
+      />
     </div>
   )
 }
