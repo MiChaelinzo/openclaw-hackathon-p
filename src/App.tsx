@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Code, Pulse, ChatCircle, Sparkle, Storefront, ChartLine, Flask, House } from '@phosphor-icons/react'
+import { Code, Pulse, ChatCircle, Sparkle, Storefront, ChartLine, Flask, House, Gear, Package } from '@phosphor-icons/react'
 import { SkillLibrary } from '@/components/SkillLibrary'
 import { ExecutionMonitor } from '@/components/ExecutionMonitor'
 import { AIAssistant } from '@/components/AIAssistant'
@@ -11,6 +11,8 @@ import { SkillDetails } from '@/components/SkillDetails'
 import { PaymentDialog } from '@/components/PaymentDialog'
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
 import { TestingPlayground } from '@/components/TestingPlayground'
+import { SkillExportImport } from '@/components/SkillExportImport'
+import { SettingsPanel } from '@/components/SettingsPanel'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -274,6 +276,10 @@ function App() {
     setViewingSkillDetails(null)
   }
 
+  const handleImportSkills = (importedSkills: Skill[]) => {
+    setSkills(current => [...(current || []), ...importedSkills])
+  }
+
   const simulateExecution = (skillId: string, skillName: string) => {
     const execution: Execution = {
       id: Date.now().toString(),
@@ -381,6 +387,14 @@ function App() {
                 <Sparkle size={20} weight="fill" />
                 Generator
               </TabsTrigger>
+              <TabsTrigger value="export" className="gap-2">
+                <Package size={20} />
+                Export/Import
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="gap-2">
+                <Gear size={20} />
+                Settings
+              </TabsTrigger>
             </TabsList>
 
             <div className="flex-1 overflow-hidden">
@@ -452,6 +466,19 @@ function App() {
                   onGenerate={handleGenerateSkill}
                   onSave={handleSaveGeneratedSkill}
                 />
+              </TabsContent>
+
+              <TabsContent value="export" className="h-full m-0">
+                <div className="h-full overflow-y-auto">
+                  <SkillExportImport
+                    skills={skills || []}
+                    onImportSkills={handleImportSkills}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="settings" className="h-full m-0">
+                <SettingsPanel />
               </TabsContent>
             </div>
           </Tabs>

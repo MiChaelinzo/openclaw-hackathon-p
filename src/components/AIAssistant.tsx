@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ChatCircle, PaperPlaneRight } from '@phosphor-icons/react'
+import { ChatCircle, PaperPlaneRight, Trash, Copy } from '@phosphor-icons/react'
+import { toast } from 'sonner'
 
 interface Message {
   id: string
@@ -20,6 +21,13 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [messages, isProcessing])
 
   const handleSend = async () => {
     if (!input.trim() || isProcessing) return
@@ -57,20 +65,57 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
     }
   }
 
+  const formatTimestamp = (timestamp: number) => {
+    const now = Date.now()
+    const diff = now - timestamp
+    const minutes = Math.floor(diff / 60000)
+    const hours = Math.floor(diff / 3600000)
+    const days = Math.floor(diff / 86400000)
+
+    if (minutes < 1) return 'Just now'
+    if (minutes < 60) return `${minutes}m ago`
+    if (hours < 24) return `${hours}h ago`
+    if (days < 7) return `${days}d ago`
+    return new Date(timestamp).toLocaleDateString()
+  }
+
+  const handleCopy = (content: string) => {
+    navigator.clipboard.writeText(content)
+    toast.success('Copied to clipboard')
+  }
+
+  const handleClearHistory = () => {
+    setMessages([])
+    toast.success('Chat history cleared')
+  }
+
   return (
-    <div className="flex flex-col gap-6 h-full">
-      <div className="flex-shrink-0">
-        <h1 className="text-[32px] font-bold leading-[38px] tracking-[-0.02em]">
-          AI Debug Assistant
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Get intelligent help debugging your agents
-        </p>
+    <div className="flex flex-col gap-4 h-full overflow-hidden">
+      <div className="flex-shrink-0 flex items-start justify-between">
+        <div>
+          <h1 className="text-[32px] font-bold leading-[38px] tracking-[-0.02em]">
+            AI Debug Assistant
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Get intelligent help debugging your agents
+          </p>
+        </div>
+        {messages.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClearHistory}
+            className="gap-2"
+          >
+            <Trash size={16} />
+            Clear
+          </Button>
+        )}
       </div>
 
       {messages.length === 0 ? (
-        <ScrollArea className="flex-1">
-          <Card className="h-full flex flex-col items-center justify-center gap-4 p-12 text-center min-h-[400px]">
+        <div className="flex-1 overflow-hidden">
+          <Card className="h-full flex flex-col items-center justify-center gap-4 p-12 text-center">
             <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
               <ChatCircle size={32} className="text-accent" />
             </div>
@@ -103,11 +148,11 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
               </button>
             </div>
           </Card>
-        </ScrollArea>
+        </div>
       ) : (
-        <Card className="flex-1 flex flex-col overflow-hidden">
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4 pb-4">
+        <Card className="flex-1 flex flex-col overflow-hidden min-h-0">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-4">
+            <div className="space-y-4">
               {messages.map(message => (
                 <div
                   key={message.id}
@@ -116,16 +161,24 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
                   }`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
+                    className={`max-w-[80%] rounded-lg p-3 group relative ${
                       message.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-secondary text-secondary-foreground'
                     }`}
                   >
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    <p className="text-xs opacity-70 mt-1">
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </p>
+                    <div className="flex items-center justify-between gap-2 mt-2">
+                      <p className="text-xs opacity-70">
+                        {formatTimestamp(message.timestamp)}
+                      </p>
+                      <button
+                        onClick={() => handleCopy(message.content)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Copy size={14} className="opacity-70 hover:opacity-100" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -147,7 +200,7 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
                 </div>
               )}
             </div>
-          </ScrollArea>
+          </div>
         </Card>
       )}
 
@@ -162,7 +215,7 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
             }
           }}
           placeholder="Ask about debugging, best practices, or OpenClaw features..."
-          className="min-h-[60px] resize-none"
+          className="min-h-[60px] max-h-[120px] resize-none"
           disabled={isProcessing}
         />
         <Button

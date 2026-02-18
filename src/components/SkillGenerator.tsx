@@ -6,9 +6,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Flask, Play, Sparkle } from '@phosphor-icons/react'
+import { Sparkle, Lightbulb, Code } from '@phosphor-icons/react'
 import type { Skill } from '@/lib/types'
+import { toast } from 'sonner'
 
 interface SkillGeneratorProps {
   onGenerate: (description: string) => Promise<{ name: string; code: string; description: string }>
@@ -33,8 +33,10 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
       const skill = await onGenerate(description)
       setGeneratedSkill(skill)
       setShowPreview(true)
+      toast.success('Skill generated successfully!')
     } catch (error) {
       console.error('Generation error:', error)
+      toast.error('Failed to generate skill. Please try again.')
     } finally {
       setIsGenerating(false)
     }
@@ -56,7 +58,7 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 h-full">
+    <div className="flex flex-col gap-4 h-full overflow-hidden">
       <div className="flex-shrink-0">
         <h1 className="text-[32px] font-bold leading-[38px] tracking-[-0.02em]">
           Skill Generator
@@ -66,11 +68,12 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
         </p>
       </div>
 
-      <ScrollArea className="flex-1">
+      <div className="flex-1 overflow-y-auto min-h-0">
         <Card className="flex flex-col gap-6 p-6">
           <div className="flex flex-col gap-4">
             <div>
-              <Label htmlFor="description" className="text-base font-medium">
+              <Label htmlFor="description" className="text-base font-medium flex items-center gap-2">
+                <Code size={20} />
                 Describe your skill
               </Label>
               <p className="text-sm text-muted-foreground mt-1 mb-3">
@@ -82,7 +85,7 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 placeholder="Example: Create a skill that monitors my GitHub repositories for new issues and sends me a summary every morning at 9 AM. It should use the GitHub API to fetch issues and format them nicely."
-                className="min-h-[200px] resize-none font-mono text-sm"
+                className="min-h-[200px] max-h-[300px] resize-y font-mono text-sm"
                 disabled={isGenerating}
               />
             </div>
@@ -95,7 +98,7 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
               >
                 {isGenerating ? (
                   <>
-                    <div className="animate-shimmer">
+                    <div className="animate-pulse">
                       <Sparkle size={20} weight="fill" />
                     </div>
                     Generating...
@@ -111,7 +114,10 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
           </div>
 
           <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold mb-3">Example prompts</h3>
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <Lightbulb size={20} weight="fill" className="text-accent" />
+              Example prompts
+            </h3>
             <div className="space-y-2">
               <button
                 onClick={() =>
@@ -146,10 +152,21 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
               >
                 Automated PR code quality checker
               </button>
+              <button
+                onClick={() =>
+                  setDescription(
+                    'Build a skill that monitors cryptocurrency prices and sends alerts when Bitcoin or Ethereum changes by more than 5% in 1 hour'
+                  )
+                }
+                className="w-full text-left p-3 rounded bg-secondary hover:bg-secondary/80 transition-colors text-sm"
+                disabled={isGenerating}
+              >
+                Crypto price movement alerts
+              </button>
             </div>
           </div>
         </Card>
-      </ScrollArea>
+      </div>
 
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
         <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
