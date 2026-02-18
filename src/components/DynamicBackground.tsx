@@ -10,12 +10,13 @@ export function DynamicBackground() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // Set initial size
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
-    const particles: Particle[] = []
-    const particleCount = 80
+    const particleCount = 50
     const connectionDistance = 150
+    const particles: Particle[] = []
 
     class Particle {
       x: number
@@ -49,13 +50,15 @@ export function DynamicBackground() {
       }
     }
 
+    // Initialize particles
     for (let i = 0; i < particleCount; i++) {
       particles.push(new Particle())
     }
 
+    let animationFrameId: number
+
     function animate() {
       if (!ctx || !canvas) return
-      
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       particles.forEach((particle, i) => {
@@ -78,12 +81,13 @@ export function DynamicBackground() {
         }
       })
 
-      requestAnimationFrame(animate)
+      animationFrameId = requestAnimationFrame(animate)
     }
 
     animate()
 
     const handleResize = () => {
+      if (!canvas) return
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
     }
@@ -92,14 +96,14 @@ export function DynamicBackground() {
 
     return () => {
       window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(animationFrameId)
     }
   }, [])
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.4 }}
+    <canvas 
+      ref={canvasRef} 
+      className="fixed inset-0 -z-10 bg-background pointer-events-none"
     />
   )
 }
