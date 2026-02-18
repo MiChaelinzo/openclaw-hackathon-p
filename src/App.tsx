@@ -13,6 +13,8 @@ import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
 import { TestingPlayground } from '@/components/TestingPlayground'
 import { SkillExportImport } from '@/components/SkillExportImport'
 import { SettingsPanel } from '@/components/SettingsPanel'
+import { LoginPage } from '@/components/auth/LoginPage'
+import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,12 +26,20 @@ import { CodeEditor } from '@/components/CodeEditor'
 import { NotificationCenter } from '@/components/NotificationCenter'
 import { QuickActions } from '@/components/QuickActions'
 import { useKeyboardShortcuts, showKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
-import type { Skill, Execution, PaymentTransaction, Review } from '@/lib/types'
+import type { Skill, Execution, PaymentTransaction, Review, UserProfile, OnboardingState, APIIntegration } from '@/lib/types'
 import { toast } from 'sonner'
 import { marketplaceSkills } from '@/lib/marketplaceDataNew'
 import { sampleReviews } from '@/lib/sampleReviews'
 
 function App() {
+  const [user, setUser] = useState<UserProfile | null>(null)
+  const [isAuthenticating, setIsAuthenticating] = useState(true)
+  const [onboardingState, setOnboardingState] = useKV<OnboardingState>('onboarding-state', {
+    completed: false,
+    currentStep: 0,
+    skipped: false
+  })
+  const [apiIntegrations, setApiIntegrations] = useKV<APIIntegration[]>('api-integrations', [])
   const [skills, setSkills] = useKV<Skill[]>('agentdev-skills', [])
   const [executions, setExecutions] = useKV<Execution[]>('agentdev-executions', [])
   const [transactions, setTransactions] = useKV<PaymentTransaction[]>('agentdev-transactions', [])
@@ -46,6 +56,58 @@ function App() {
     code: '',
     category: 'Custom'
   })
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const userInfo = await window.spark.user()
+        setUser(userInfo)
+      } catch (error) {
+        console.error('Failed to load user:', error)
+        setUser(null)
+      } finally {
+        setIsAuthenticating(false)
+      }
+    }
+    loadUser()
+  }, [])
+
+  useEffect(() => {
+    if (!reviews || reviews.length === 0) {
+      setReviews(sampleReviews)
+    }
+  }, [])
+
+  const handleLogin = async () => {
+    try {
+      const userInfo = await window.spark.user()
+      if (userInfo) {
+        setUser(userInfo)
+        toast.success(`Welcome, ${userInfo.login}!`)
+      }
+    } catch (error) {
+      toast.error('Authentication failed')
+    }
+  }
+
+  const handleOnboardingComplete = (integrations: APIIntegration[]) => {
+    setApiIntegrations(integrations)
+    setOnboardingState({
+      completed: true,
+      currentStep: 4,
+      completedAt: Date.now(),
+      skipped: false
+    })
+  }
+
+  const handleOnboardingSkip = () => {
+    setOnboardingState(current => ({
+      completed: true,
+      currentStep: current?.currentStep || 0,
+      completedAt: Date.now(),
+      skipped: true
+    }))
+  }
 
   const handleCreateSkill = () => {
     setNewSkill({
@@ -97,12 +159,6 @@ function App() {
       }
     ]
   })
-
-  useEffect(() => {
-    if (!reviews || reviews.length === 0) {
-      setReviews(sampleReviews)
-    }
-  }, [])
 
   const handleSaveSkill = () => {
     if (!newSkill.name || !newSkill.code) {
@@ -321,6 +377,41 @@ function App() {
         )
       )
     }, 3000)
+  }
+
+  if (isAuthenticating) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4 animate-pulse">
+            <Code size={32} className="text-primary" />
+          </div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <>
+        <Toaster />
+        <LoginPage onLogin={handleLogin} />
+      </>
+    )
+  }
+
+  if (!onboardingState?.completed && !onboardingState?.skipped) {
+    return (
+      <>
+        <Toaster />
+        <OnboardingFlow
+          onComplete={handleOnboardingComplete}
+          onSkip={handleOnboardingSkip}
+          userName={user.login}
+        />
+      </>
+    )
   }
 
   return (

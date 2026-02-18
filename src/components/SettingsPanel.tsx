@@ -16,6 +16,8 @@ import {
   Shield
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import { APIIntegrations } from '@/components/settings/APIIntegrations'
+import type { APIIntegration } from '@/lib/types'
 
 interface Settings {
   notifications: {
@@ -60,6 +62,7 @@ const defaultSettings: Settings = {
 
 export function SettingsPanel() {
   const [settings, setSettings] = useKV<Settings>('app-settings', defaultSettings)
+  const [apiIntegrations, setApiIntegrations] = useKV<APIIntegration[]>('api-integrations', [])
   const [activeTab, setActiveTab] = useState('notifications')
   
   const currentSettings = settings || defaultSettings
@@ -81,6 +84,20 @@ export function SettingsPanel() {
   const resetSettings = () => {
     setSettings(defaultSettings)
     toast.success('Settings reset to defaults')
+  }
+
+  const handleAddIntegration = (integration: APIIntegration) => {
+    setApiIntegrations(current => [...(current || []), integration])
+  }
+
+  const handleRemoveIntegration = (id: string) => {
+    setApiIntegrations(current => (current || []).filter(i => i.id !== id))
+  }
+
+  const handleUpdateIntegration = (integration: APIIntegration) => {
+    setApiIntegrations(current => 
+      (current || []).map(i => i.id === integration.id ? integration : i)
+    )
   }
 
   return (
@@ -183,37 +200,12 @@ export function SettingsPanel() {
           </TabsContent>
 
           <TabsContent value="api" className="m-0">
-            <Card className="p-6 space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="github-token">GitHub Personal Access Token</Label>
-                <Input
-                  id="github-token"
-                  type="password"
-                  placeholder="ghp_xxxxxxxxxxxx"
-                  value={currentSettings.api.githubToken || ''}
-                  onChange={(e) => updateSettings('api', 'githubToken', e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Required for GitHub-related skills
-                </p>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <Label htmlFor="openai-key">OpenAI API Key</Label>
-                <Input
-                  id="openai-key"
-                  type="password"
-                  placeholder="sk-xxxxxxxxxxxx"
-                  value={currentSettings.api.openaiKey || ''}
-                  onChange={(e) => updateSettings('api', 'openaiKey', e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  For AI-powered skills and features
-                </p>
-              </div>
-            </Card>
+            <APIIntegrations
+              integrations={apiIntegrations || []}
+              onAdd={handleAddIntegration}
+              onRemove={handleRemoveIntegration}
+              onUpdate={handleUpdateIntegration}
+            />
           </TabsContent>
 
           <TabsContent value="theme" className="m-0">

@@ -101,3 +101,41 @@ export interface ReviewStats {
     5: number
   }
 }
+
+export interface UserProfile {
+  login: string
+  email: string
+  avatarUrl: string
+  id: number
+  isOwner: boolean
+}
+
+export interface OnboardingState {
+  completed: boolean
+  currentStep: number
+  completedAt?: number
+  skipped: boolean
+}
+
+export interface APIIntegration {
+  id: string
+  name: string
+  type: 'github' | 'openai' | 'anthropic' | 'custom'
+  apiKey: string
+  isValid?: boolean
+  lastValidated?: number
+  createdAt: number
+  updatedAt: number
+  metadata?: {
+    baseUrl?: string
+    organizationId?: string
+    customHeaders?: Record<string, string>
+  }
+}
+
+export interface AppSettings {
+  theme: 'light' | 'dark'
+  notifications: boolean
+  autoSave: boolean
+  codeEditorTheme: string
+}

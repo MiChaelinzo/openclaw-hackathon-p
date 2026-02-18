@@ -1,6 +1,6 @@
 # Planning Guide
 
-AgentDev Studio is a comprehensive visual development environment for OpenClaw agents that accelerates agent development through real-time monitoring, interactive testing, and AI-powered debugging assistance.
+AgentDev Studio is a comprehensive visual development environment for OpenClaw agents that accelerates agent development through real-time monitoring, interactive testing, AI-powered debugging assistance, and seamless API integration with personalized onboarding.
 
 **Experience Qualities**: 
 1. **Professional** - Clean, developer-focused interface that prioritizes functionality and clarity over decoration
@@ -8,9 +8,30 @@ AgentDev Studio is a comprehensive visual development environment for OpenClaw a
 3. **Responsive** - Real-time updates and immediate feedback that make agent development feel fluid and iterative
 
 **Complexity Level**: Complex Application (advanced functionality, likely with multiple views)
-This is a full-featured developer tool with multiple interconnected systems: skill editor, execution monitor, log viewer, AI assistant, and testing interface. It requires sophisticated state management, real-time data handling, and integration patterns.
+This is a full-featured developer tool with multiple interconnected systems: authentication, onboarding, API configuration, skill editor, execution monitor, log viewer, AI assistant, and testing interface. It requires sophisticated state management, real-time data handling, and integration patterns.
 
 ## Essential Features
+
+### 0. Authentication & User Management
+- **Functionality**: GitHub-based authentication using Spark's user API, with persistent session management
+- **Purpose**: Personalize the experience, track user progress, and enable secure API credential storage
+- **Trigger**: User visits app for the first time or session expires
+- **Progression**: Landing page → Sign in with GitHub → Fetch user info → Store session → Redirect to onboarding or dashboard
+- **Success criteria**: Users can authenticate securely, see their GitHub profile, and maintain sessions across page reloads
+
+### 0a. Onboarding Flow
+- **Functionality**: Multi-step guided onboarding introducing core features, collecting preferences, and configuring API integrations
+- **Purpose**: Help new users understand the platform quickly and set up their development environment
+- **Trigger**: First-time user completes authentication
+- **Progression**: Welcome screen → Feature tour (3-4 slides) → API configuration (GitHub, OpenAI) → Create first skill prompt → Complete and enter dashboard
+- **Success criteria**: Users complete onboarding, have configured at least one API key, understand core features, and feel confident to start building
+
+### 0b. API Integration Management
+- **Functionality**: Secure storage and management of API keys for GitHub, OpenAI, and other services with validation and test functionality
+- **Purpose**: Enable skills to interact with external services securely and provide centralized credential management
+- **Trigger**: User navigates to Settings → API Integrations or during onboarding
+- **Progression**: Open API settings → Add new integration → Enter API key → Validate connection → Save encrypted → Use in skills
+- **Success criteria**: Users can securely add, test, update, and remove API keys; keys are encrypted in storage; validation provides clear feedback
 
 ### 1. Skill Library & Editor
 - **Functionality**: Browse, create, edit, and test OpenClaw skills with syntax highlighting and validation
@@ -91,6 +112,16 @@ This is a full-featured developer tool with multiple interconnected systems: ski
 
 ## Edge Case Handling
 
+- **Unauthenticated Access**: Redirect to login page and preserve intended destination
+- **Session Expiry**: Gracefully detect expired sessions and prompt re-authentication without data loss
+- **Failed Authentication**: Show clear error messages with retry options
+- **Incomplete Onboarding**: Allow skipping but surface completion prompts strategically
+- **Invalid API Keys**: Validate immediately and provide specific error messages (rate limit, invalid format, expired)
+- **API Key Conflicts**: Warn when updating keys that are actively used in skills
+- **Network Failures During Auth**: Implement retry logic with exponential backoff
+- **Missing GitHub Email**: Handle users without public emails gracefully
+- **First-time vs. Returning Users**: Detect and skip onboarding for returning users
+- **API Service Outages**: Show service status and gracefully degrade features
 - **Empty States**: Show helpful getting-started guides when no skills exist or no executions have run
 - **Large Logs**: Virtualize log displays and provide filtering to handle thousands of log entries
 - **Syntax Errors**: Real-time validation with inline error messages and quick-fix suggestions
