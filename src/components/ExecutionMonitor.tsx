@@ -48,7 +48,7 @@ export function ExecutionMonitor({ executions }: ExecutionMonitorProps) {
           </div>
         </Card>
       ) : (
-        <div className="flex-1 overflow-hidden flex flex-col gap-4">
+        <div className="flex-1 overflow-auto flex flex-col gap-4">
           {executions.map(execution => (
             <Card key={execution.id} className="p-4">
               <div className="flex items-start justify-between mb-4">

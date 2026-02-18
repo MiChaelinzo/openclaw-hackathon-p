@@ -158,8 +158,8 @@ export function SkillMarketplace({
         </div>
       </div>
 
-      <Tabs defaultValue="browse" className="flex-1 flex flex-col">
-        <TabsList className="w-fit">
+      <Tabs defaultValue="browse" className="flex-1 flex flex-col overflow-hidden">
+        <TabsList className="w-fit flex-shrink-0">
           <TabsTrigger value="browse" className="gap-2">
             <MagnifyingGlass size={18} />
             Browse
@@ -174,7 +174,7 @@ export function SkillMarketplace({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="browse" className="flex-1 flex flex-col gap-4 mt-4">
+        <TabsContent value="browse" className="flex-1 flex flex-col gap-4 mt-4 overflow-hidden">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
               <MagnifyingGlass 
@@ -318,14 +318,14 @@ export function SkillMarketplace({
           </div>
         </TabsContent>
 
-        <TabsContent value="featured" className="flex-1 flex flex-col gap-4 mt-4">
-          <div className="flex items-center gap-2 mb-2">
+        <TabsContent value="featured" className="flex-1 flex flex-col gap-4 mt-4 overflow-hidden">
+          <div className="flex items-center gap-2 mb-2 flex-shrink-0">
             <Sparkle size={24} weight="fill" className="text-accent" />
             <h2 className="text-[24px] font-semibold leading-[30px] tracking-[-0.01em]">
               Featured Skills
             </h2>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-sm text-muted-foreground mb-4 flex-shrink-0">
             Hand-picked, verified skills with exceptional quality and ratings
           </p>
           <div className="flex-1 overflow-auto">
@@ -343,14 +343,14 @@ export function SkillMarketplace({
           </div>
         </TabsContent>
 
-        <TabsContent value="trending" className="flex-1 flex flex-col gap-4 mt-4">
-          <div className="flex items-center gap-2 mb-2">
+        <TabsContent value="trending" className="flex-1 flex flex-col gap-4 mt-4 overflow-hidden">
+          <div className="flex items-center gap-2 mb-2 flex-shrink-0">
             <TrendUp size={24} className="text-success" />
             <h2 className="text-[24px] font-semibold leading-[30px] tracking-[-0.01em]">
               Trending Skills
             </h2>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-sm text-muted-foreground mb-4 flex-shrink-0">
             Most downloaded skills in the community right now
           </p>
           <div className="flex-1 overflow-auto">
