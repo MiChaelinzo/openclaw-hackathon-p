@@ -37,6 +37,7 @@ import { sampleReviews } from '@/lib/sampleReviews'
 function App() {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [isAuthenticating, setIsAuthenticating] = useState(true)
+  const [hasLoggedIn, setHasLoggedIn] = useKV<boolean>('has-logged-in', false)
   const [onboardingState, setOnboardingState] = useKV<OnboardingState>('onboarding-state', {
     completed: false,
     currentStep: 0,
@@ -64,7 +65,9 @@ function App() {
     async function loadUser() {
       try {
         const userInfo = await window.spark.user()
-        setUser(userInfo)
+        if (hasLoggedIn) {
+          setUser(userInfo)
+        }
       } catch (error) {
         console.error('Failed to load user:', error)
         setUser(null)
@@ -73,7 +76,7 @@ function App() {
       }
     }
     loadUser()
-  }, [])
+  }, [hasLoggedIn])
 
   useEffect(() => {
     if (!reviews || reviews.length === 0) {
@@ -86,6 +89,7 @@ function App() {
       const userInfo = await window.spark.user()
       if (userInfo) {
         setUser(userInfo)
+        setHasLoggedIn(true)
         toast.success(`Welcome, ${userInfo.login}!`)
       }
     } catch (error) {
@@ -114,6 +118,7 @@ function App() {
 
   const handleLogout = () => {
     setUser(null)
+    setHasLoggedIn(false)
     setSkills([])
     setExecutions([])
     setTransactions([])
