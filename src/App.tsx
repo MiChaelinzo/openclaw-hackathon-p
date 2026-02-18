@@ -29,6 +29,10 @@ import { CodeEditor } from '@/components/CodeEditor'
 import { NotificationCenter } from '@/components/NotificationCenter'
 import { QuickActions } from '@/components/QuickActions'
 import { useKeyboardShortcuts, showKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
+import { DynamicBackground } from '@/components/DynamicBackground'
+import { MouseTrail } from '@/components/MouseTrail'
+import { AnimatedGradient } from '@/components/AnimatedGradient'
+import { CursorGlow } from '@/components/CursorGlow'
 import type { Skill, Execution, PaymentTransaction, Review, UserProfile, OnboardingState, APIIntegration } from '@/lib/types'
 import { toast } from 'sonner'
 import { marketplaceSkills } from '@/lib/marketplaceDataNew'
@@ -436,9 +440,13 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative">
+      <AnimatedGradient />
+      <DynamicBackground />
+      <CursorGlow />
+      <MouseTrail />
       <Toaster />
-      <div className="border-b border-border bg-card">
+      <div className="border-b border-border bg-card/80 backdrop-blur-sm relative z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -496,7 +504,7 @@ function App() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-6 h-[calc(100vh-88px)]">
+      <div className="container mx-auto px-6 py-6 h-[calc(100vh-88px)] relative z-10">
         {viewingSkillDetails ? (
           <SkillDetails
             skill={viewingSkillDetails}
