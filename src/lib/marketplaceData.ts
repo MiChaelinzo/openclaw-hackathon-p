@@ -1,8 +1,10 @@
 import type { Skill } from '@/lib/types'
 
 const now = Date.now()
+const minutesAgo = (minutes: number) => now - minutes * 60 * 1000
 const hoursAgo = (hours: number) => now - hours * 60 * 60 * 1000
 const daysAgo = (days: number) => now - days * 24 * 60 * 60 * 1000
+const weeksAgo = (weeks: number) => now - weeks * 7 * 24 * 60 * 60 * 1000
 
 export const marketplaceSkills: Skill[] = [
   {

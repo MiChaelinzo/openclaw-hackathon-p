@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Flask, Play, Sparkle } from '@phosphor-icons/react'
 import type { Skill } from '@/lib/types'
 
@@ -55,7 +56,7 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 h-full overflow-hidden">
+    <div className="flex flex-col gap-6 h-full">
       <div className="flex-shrink-0">
         <h1 className="text-[32px] font-bold leading-[38px] tracking-[-0.02em]">
           Skill Generator
@@ -65,8 +66,8 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
         </p>
       </div>
 
-      <div className="flex-1 overflow-auto min-h-0">
-        <Card className="flex flex-col gap-6 p-6 h-full">
+      <ScrollArea className="flex-1">
+        <Card className="flex flex-col gap-6 p-6">
           <div className="flex flex-col gap-4">
             <div>
               <Label htmlFor="description" className="text-base font-medium">
@@ -148,7 +149,7 @@ export function SkillGenerator({ onGenerate, onSave }: SkillGeneratorProps) {
             </div>
           </div>
         </Card>
-      </div>
+      </ScrollArea>
 
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
         <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">

@@ -24,7 +24,7 @@ import { QuickActions } from '@/components/QuickActions'
 import { useKeyboardShortcuts, showKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import type { Skill, Execution, PaymentTransaction, Review } from '@/lib/types'
 import { toast } from 'sonner'
-import { marketplaceSkills } from '@/lib/marketplaceData'
+import { marketplaceSkills } from '@/lib/marketplaceDataNew'
 import { sampleReviews } from '@/lib/sampleReviews'
 
 function App() {

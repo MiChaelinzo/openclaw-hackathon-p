@@ -58,7 +58,7 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 h-full overflow-hidden">
+    <div className="flex flex-col gap-6 h-full">
       <div className="flex-shrink-0">
         <h1 className="text-[32px] font-bold leading-[38px] tracking-[-0.02em]">
           AI Debug Assistant
@@ -69,8 +69,8 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
       </div>
 
       {messages.length === 0 ? (
-        <div className="flex-1 overflow-auto">
-          <Card className="h-full flex flex-col items-center justify-center gap-4 p-12 text-center">
+        <ScrollArea className="flex-1">
+          <Card className="h-full flex flex-col items-center justify-center gap-4 p-12 text-center min-h-[400px]">
             <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
               <ChatCircle size={32} className="text-accent" />
             </div>
@@ -103,11 +103,11 @@ export function AIAssistant({ onAnalyze }: AIAssistantProps) {
               </button>
             </div>
           </Card>
-        </div>
+        </ScrollArea>
       ) : (
-        <Card className="flex-1 flex flex-col overflow-hidden min-h-0">
+        <Card className="flex-1 flex flex-col overflow-hidden">
           <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
+            <div className="space-y-4 pb-4">
               {messages.map(message => (
                 <div
                   key={message.id}
