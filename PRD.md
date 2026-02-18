@@ -103,6 +103,13 @@ This is a full-featured developer tool with multiple interconnected systems: aut
 - **Progression**: Select skill → Choose collaboration mode → Share link or fork → Collaborators access → Merge improvements
 - **Success criteria**: Teams can collaborate effectively on skill development
 
+### 11. User Profile & Preferences
+- **Functionality**: Comprehensive user profile page showing account details, statistics, and personalized preferences
+- **Purpose**: Allow users to manage their account, customize their experience, and track their activity
+- **Trigger**: User clicks "Profile" in dropdown menu or Profile tab
+- **Progression**: View profile → See stats (skills, executions, success rate) → Edit profile info (display name, bio) → Configure preferences (notifications, editor settings) → View activity history → Manage security settings
+- **Success criteria**: Users can view their profile stats, edit personal information, configure notification and editor preferences, review recent activity, and access account security information
+
 ### 7. x402 Micropayment Integration
 - **Functionality**: Frictionless USDC micropayments for premium skills using x402 protocol on Base network
 - **Purpose**: Enable monetization of premium skills and create an economic layer for the OpenClaw ecosystem

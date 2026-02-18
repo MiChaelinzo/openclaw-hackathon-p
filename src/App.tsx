@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Code, Pulse, ChatCircle, Sparkle, Storefront, ChartLine, Flask, House, Gear, Package, SignOut, User } from '@phosphor-icons/react'
+import { Code, Pulse, ChatCircle, Sparkle, Storefront, ChartLine, Flask, House, Gear, Package, SignOut, User, UserCircle } from '@phosphor-icons/react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { SkillLibrary } from '@/components/SkillLibrary'
@@ -15,6 +15,7 @@ import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
 import { TestingPlayground } from '@/components/TestingPlayground'
 import { SkillExportImport } from '@/components/SkillExportImport'
 import { SettingsPanel } from '@/components/SettingsPanel'
+import { ProfilePage } from '@/components/ProfilePage'
 import { LoginPage } from '@/components/auth/LoginPage'
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -470,6 +471,10 @@ function App() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setActiveTab('profile')}>
+                    <UserCircle className="mr-2" size={16} />
+                    Profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setActiveTab('settings')}>
                     <Gear className="mr-2" size={16} />
                     Settings
@@ -532,6 +537,10 @@ function App() {
               <TabsTrigger value="export" className="gap-2">
                 <Package size={20} />
                 Export/Import
+              </TabsTrigger>
+              <TabsTrigger value="profile" className="gap-2">
+                <UserCircle size={20} />
+                Profile
               </TabsTrigger>
               <TabsTrigger value="settings" className="gap-2">
                 <Gear size={20} />
@@ -617,6 +626,14 @@ function App() {
                     onImportSkills={handleImportSkills}
                   />
                 </div>
+              </TabsContent>
+
+              <TabsContent value="profile" className="h-full m-0">
+                <ProfilePage 
+                  user={user}
+                  skills={skills || []}
+                  executions={executions || []}
+                />
               </TabsContent>
 
               <TabsContent value="settings" className="h-full m-0">
