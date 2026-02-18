@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Code, Pulse, ChatCircle, Sparkle, Storefront, ChartLine, Flask, House, Gear, Package } from '@phosphor-icons/react'
+import { Code, Pulse, ChatCircle, Sparkle, Storefront, ChartLine, Flask, House, Gear, Package, SignOut, User } from '@phosphor-icons/react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { SkillLibrary } from '@/components/SkillLibrary'
 import { ExecutionMonitor } from '@/components/ExecutionMonitor'
 import { AIAssistant } from '@/components/AIAssistant'
@@ -107,6 +109,19 @@ function App() {
       completedAt: Date.now(),
       skipped: true
     }))
+  }
+
+  const handleLogout = () => {
+    setUser(null)
+    setSkills([])
+    setExecutions([])
+    setTransactions([])
+    setOnboardingState({
+      completed: false,
+      currentStep: 0,
+      skipped: false
+    })
+    toast.success('Logged out successfully')
   }
 
   const handleCreateSkill = () => {
@@ -426,10 +441,46 @@ function App() {
                 OpenClaw Development Environment
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <NotificationCenter />
-              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span className="text-sm text-muted-foreground">Connected</span>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                <span className="text-sm text-muted-foreground">Connected</span>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 rounded-full hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.avatarUrl} alt={user.login} />
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {user.login.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.login}</p>
+                      {user.email && (
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      )}
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setActiveTab('settings')}>
+                    <Gear className="mr-2" size={16} />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} variant="destructive">
+                    <SignOut className="mr-2" size={16} />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
